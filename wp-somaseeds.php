@@ -18,6 +18,8 @@
 defined( 'ABSPATH' ) || exit;
 
 require_once plugin_dir_path( __FILE__ ) . '/inc/class-sose-data.php';
+require_once plugin_dir_path( __FILE__ ) . '/inc/lib.php';
+require_once plugin_dir_path( __FILE__ ) . '/inc/class-mqtt-request.php';
 
 /**
  * Handle plugin activation.
@@ -54,3 +56,37 @@ function sose_handle_data() {
 
 add_action("wp_ajax_sosedata","sose_handle_data");
 add_action("wp_ajax_nopriv_sosedata","sose_handle_data");
+
+function sose_admin_page() {
+	$vars=array();
+
+	if (array_key_exists("relay", $_REQUEST)) {
+		$r=new MqttRequest(array(
+			"server"=>"postman.cloudmqtt.com",
+			"id"=>"wp",
+			"port"=>13342,
+			"user"=>"hbpiywwf",
+			"pass"=>"VO5sPd3HeesO",
+			"topic"=>"mbr"
+		));
+
+		$res=$r->request(array(
+			"action"=>"relay",
+			"relay"=>$_REQUEST["relay"],
+			"val"=>$_REQUEST["val"]
+		));
+	}
+
+	display_template(__DIR__."/tpl/sose-admin-page.tpl.php",$vars);
+}
+
+function sose_admin_menu() {
+	add_menu_page(
+		'Somaseeds',
+		'Somaseeds',
+		'manage_options',
+		'somaseeds',
+		'sose_admin_page'
+	);
+}
+add_action('admin_menu','sose_admin_menu');
