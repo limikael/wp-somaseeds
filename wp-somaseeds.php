@@ -6,7 +6,7 @@
  * Plugin URI:        https://github.com/limikael/wp-somaseeds
  * GitHub Plugin URI: https://github.com/limikael/wp-somaseeds
  * Description:       Stores data from the MBR.
- * Version:           1.0
+ * Version:           1.1
  * Requires at least: 5.2
  * Requires PHP:      7.2
  * Author:            Mikael Lindqvist & Derek Smith
@@ -19,7 +19,6 @@ defined( 'ABSPATH' ) || exit;
 
 require_once plugin_dir_path( __FILE__ ) . '/inc/class-sose-data.php';
 require_once plugin_dir_path( __FILE__ ) . '/inc/lib.php';
-require_once plugin_dir_path( __FILE__ ) . '/inc/class-mqtt-request.php';
 
 /**
  * Handle plugin activation.
@@ -61,20 +60,18 @@ function sose_admin_page() {
 	$vars=array();
 
 	if (array_key_exists("relay", $_REQUEST)) {
-		$r=new MqttRequest(array(
-			"server"=>"postman.cloudmqtt.com",
-			"id"=>"wp",
-			"port"=>13342,
-			"user"=>"hbpiywwf",
-			"pass"=>"VO5sPd3HeesO",
-			"topic"=>"mbr"
-		));
-
-		$res=$r->request(array(
-			"action"=>"relay",
+		$params=array(
 			"relay"=>$_REQUEST["relay"],
 			"val"=>$_REQUEST["val"]
-		));
+		);
+
+		$url="http://wordpress-59420-1495432.cloudwaysapps.com:8888/somaseeds1/relay/?".
+			http_build_query($params);
+
+		$curl=curl_init();
+		curl_setopt($curl,CURLOPT_URL,$url);
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
+		$res=curl_exec($curl);
 	}
 
 	display_template(__DIR__."/tpl/sose-admin-page.tpl.php",$vars);
