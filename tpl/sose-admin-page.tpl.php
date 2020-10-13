@@ -23,6 +23,10 @@
 
 	<p>
 		<a class="button"
+				href="<?php echo admin_url("admin.php?page=somaseeds&steps=4000"); ?>">
+			-20
+		</a>
+		<a class="button"
 				href="<?php echo admin_url("admin.php?page=somaseeds&steps=-1000"); ?>">
 			-5
 		</a>
@@ -45,6 +49,10 @@
 		<a class="button"
 				href="<?php echo admin_url("admin.php?page=somaseeds&steps=1000"); ?>">
 			+5
+		</a>
+		<a class="button"
+				href="<?php echo admin_url("admin.php?page=somaseeds&steps=4000"); ?>">
+			+20
 		</a>
 	</p>
 </div>
