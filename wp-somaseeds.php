@@ -74,6 +74,20 @@ function sose_admin_page() {
 		$res=curl_exec($curl);
 	}
 
+	if (array_key_exists("steps", $_REQUEST)) {
+		$params=array(
+			"steps"=>$_REQUEST["steps"]
+		);
+
+		$url="http://wordpress-59420-1495432.cloudwaysapps.com:8888/somaseeds1/step/?".
+			http_build_query($params);
+
+		$curl=curl_init();
+		curl_setopt($curl,CURLOPT_URL,$url);
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
+		$res=curl_exec($curl);
+	}
+
 	display_template(__DIR__."/tpl/sose-admin-page.tpl.php",$vars);
 }
 
