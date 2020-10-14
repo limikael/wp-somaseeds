@@ -18,6 +18,7 @@
 defined( 'ABSPATH' ) || exit;
 
 require_once plugin_dir_path( __FILE__ ) . '/inc/class-sose-data.php';
+require_once plugin_dir_path( __FILE__ ) . '/inc/class-sose-api.php';
 require_once plugin_dir_path( __FILE__ ) . '/inc/lib.php';
 
 /**
@@ -58,36 +59,32 @@ add_action("wp_ajax_nopriv_sosedata","sose_handle_data");
 
 function sose_admin_page() {
 	$vars=array();
+	$api=new SoseApi("http://wordpress-59420-1495432.cloudwaysapps.com:8888/somaseeds1/");
 
 	if (array_key_exists("relay", $_REQUEST)) {
-		$params=array(
+		$api->call("relay",array(
 			"relay"=>$_REQUEST["relay"],
 			"val"=>$_REQUEST["val"]
-		);
-
-		$url="http://wordpress-59420-1495432.cloudwaysapps.com:8888/somaseeds1/relay/?".
-			http_build_query($params);
-
-		$curl=curl_init();
-		curl_setopt($curl,CURLOPT_URL,$url);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
-		$res=curl_exec($curl);
+		));
 	}
 
 	if (array_key_exists("steps", $_REQUEST)) {
-		$params=array(
+		$api->call("step",array(
 			"steps"=>$_REQUEST["steps"]
-		);
-
-		$url="http://wordpress-59420-1495432.cloudwaysapps.com:8888/somaseeds1/step/?".
-			http_build_query($params);
-
-		$curl=curl_init();
-		curl_setopt($curl,CURLOPT_URL,$url);
-		curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
-		$res=curl_exec($curl);
+		));
 	}
 
+	if (array_key_exists("start", $_REQUEST)) {
+		$api->call("start",array(
+			"rpm"=>$_REQUEST["rpm"]
+		));
+	}
+
+	if (array_key_exists("stop", $_REQUEST)) {
+		$api->call("stop");
+	}
+
+	$vars["formurl"]=admin_url("admin.php?page=somaseeds");
 	display_template(__DIR__."/tpl/sose-admin-page.tpl.php",$vars);
 }
 

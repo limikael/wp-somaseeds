@@ -19,7 +19,26 @@
 		</p>
 	<?php } ?>
 
-	<h2>Stepper</h2>
+	<h2>Stepper Start and Stop</h2>
+
+	<form action="<?php echo $formurl; ?>" method="GET">
+		<input type="hidden" name="page" value="somaseeds"/>
+		<table class="form-table">
+			<tr>
+				<th><label>Rpm</label></th>
+				<td><input type="text" name="rpm"></td>
+			</tr>
+			<tr>
+				<th><label></label></th>
+				<td>
+					<input type="submit" class="button" value="Start" name="start"/>
+					<input type="submit" class="button" value="Stop" name="stop"/>
+				</td>
+			</tr>
+		</table>
+	</form>
+
+	<h2>Stepper Revolutions</h2>
 
 	<p>
 		<a class="button"
