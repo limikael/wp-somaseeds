@@ -12,6 +12,9 @@ class SoseData extends WpRecord {
 		self::field( 'max', 'float not null' );
 		self::field( 'span', 'char(16) not null' );
 		self::field( 'summarized', 'tinyint not null' );
+
+		self::index( 'stamprange', '(var,span,stamp)');
+		self::index( 'stamprange_summarized', '(var,span,summarized,stamp)');
 	}
 
 	public static function summarize($var, $fromSpan, $toSpan, $time) {

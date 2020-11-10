@@ -70,6 +70,13 @@ if (!class_exists("WpRecord")) {
 		}
 
 		/**
+		 * Add field.
+		 */
+		protected static final function index($name, $definition) {
+			self::$classes[get_called_class()]["indices"][$name]=$definition;
+		}
+
+		/**
 		 * Init.
 		 */
 		private final static function init() {
@@ -81,6 +88,7 @@ if (!class_exists("WpRecord")) {
 				return;
 
 			self::$classes[$class]=array("fields"=>array());
+			self::$classes[$class]=array("indices"=>array());
 
 			$a=explode("\\",get_called_class());
 			$s=strtolower($a[sizeof($a)-1]);
@@ -99,6 +107,7 @@ if (!class_exists("WpRecord")) {
 
 			$table=self::$classes[get_called_class()]["table"];
 			$fields=self::$classes[get_called_class()]["fields"];
+			$indices=self::$classes[get_called_class()]["indices"];
 			$primaryKey=self::$classes[get_called_class()]["primaryKey"];
 
 			// Create table if it doesn't exist.
@@ -121,7 +130,7 @@ if (!class_exists("WpRecord")) {
 			// Create or modify existing fields.
 			foreach ($fields as $name=>$declaration) {
 				if (in_array($name,$existing)) {
-					$q="ALTER TABLE `$table` MODIFY $name $declaration";
+					$q="ALTER TABLE `$table` MODIFY `$name` $declaration";
 				}
 
 				else {
@@ -135,7 +144,36 @@ if (!class_exists("WpRecord")) {
 			$currentFieldNames=array_keys($fields);
 			foreach ($existing as $existingField) {
 				if (!in_array($existingField, $currentFieldNames)) {
-					self::query("ALTER TABLE $table DROP $existingField");
+					self::query("ALTER TABLE $table DROP `$existingField`");
+				}
+			}
+
+			// Check existing indices.
+			$describeResult=self::query("SHOW INDEX FROM ".$table);
+			$existingIndices=array();
+			foreach ($describeResult as $describeRow)
+				if (!in_array($describeRow["Key_name"],$existingIndices)
+						&& $describeRow["Key_name"]!="PRIMARY")
+					$existingIndices[]=$describeRow["Key_name"];
+
+			// Create or modify indices.
+			foreach ($indices as $name=>$declaration) {
+				if (in_array($name,$existingIndices)) {
+					$q="ALTER TABLE `$table` DROP INDEX `$name`, ADD INDEX `$name` $declaration";
+				}
+
+				else {
+					$q="ALTER TABLE `$table` ADD INDEX `$name` $declaration";
+				}
+
+				self::query($q);
+			}
+
+			// Drup unused indices.
+			$currentIndexNames=array_keys($indices);
+			foreach ($existingIndices as $existingIndex) {
+				if (!in_array($existingIndex, $currentIndexNames)) {
+					self::query("ALTER TABLE `$table` DROP INDEX `$existingIndex`");
 				}
 			}
 		}

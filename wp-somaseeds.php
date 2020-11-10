@@ -113,11 +113,11 @@ function sose_admin_menu() {
 add_action('admin_menu','sose_admin_menu');
 
 function sose_test() {
-/*	SoseData::query("DELETE FROM :table");
+	SoseData::query("DELETE FROM :table");
 
 	$t=strtotime("2020-01-01 09:00:00 UTC");
 
-	for ($i=0; $i<7200; $i++) {
+	for ($i=0; $i<1000; $i++) {
 		$v=rand(0,999);
 
 		$d=new SoseData();
@@ -128,11 +128,10 @@ function sose_test() {
 		$d->max=$v;
 		$d->stamp=gmdate("Y-m-d H:i:s",$t+$i*5);
 		$d->save();
-	}*/
+	}
 
-//	$t=strtotime("2020-01-01 09:02:15 UTC");
 	$t=strtotime("2020-01-02 09:02:15 UTC");
-//	SoseData::summarize("temp","live","minutely",$t);
+	SoseData::summarize("temp","live","minutely",$t);
 	SoseData::summarize("temp","minutely","hourly",$t);
 
 	return "testing... hello...";
