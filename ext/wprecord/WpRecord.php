@@ -347,7 +347,7 @@ if (!class_exists("WpRecord")) {
 		 * Run query with parameters.
 		 * The parameters are varadic!
 		 */
-		private static final function query($q /* ... */) {
+		public static final function query($q /* ... */) {
 			$params=self::flattenArray(array_slice(func_get_args(),1));
 
 			//echo "q: ".$q." p: ".print_r($params, TRUE);
@@ -366,6 +366,7 @@ if (!class_exists("WpRecord")) {
 					$q=call_user_func_array(array($wpdb,"prepare"),$arg);
 				}
 
+				//echo $q;
 				$res=$wpdb->get_results($q,ARRAY_A);
 
 				if ($wpdb->last_error)

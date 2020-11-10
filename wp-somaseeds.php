@@ -45,11 +45,24 @@ register_uninstall_hook( __FILE__, 'sose_uninstall' );
  * Handle data.
  */
 function sose_handle_data() {
+	$t=time();
+
+	$var=$_REQUEST["var"];
+	if (!$var) {
+		echo "no variable to save...";
+		wp_die();
+	}
+
 	$data=new SoseData();
-	$data->var=$_REQUEST["var"];
+	$data->var=$var;
 	$data->value=$_REQUEST["value"];
-	$data->stamp=current_time("mysql");
+	$data->stamp=gmdate($t);
+	$data->span="live";
 	$data->save();
+
+	SoseData::summarize($var,"live","minutely",$t);
+	SoseData::summarize($var,"minutely","hourly",$t);
+	SoseData::summarize($var,"hourly","daily",$t);
 
 	wp_die();
 }
@@ -98,3 +111,30 @@ function sose_admin_menu() {
 	);
 }
 add_action('admin_menu','sose_admin_menu');
+
+function sose_test() {
+/*	SoseData::query("DELETE FROM :table");
+
+	$t=strtotime("2020-01-01 09:00:00 UTC");
+
+	for ($i=0; $i<7200; $i++) {
+		$v=rand(0,999);
+
+		$d=new SoseData();
+		$d->var="temp";
+		$d->span="live";
+		$d->value=$v;
+		$d->min=$v;
+		$d->max=$v;
+		$d->stamp=gmdate("Y-m-d H:i:s",$t+$i*5);
+		$d->save();
+	}*/
+
+//	$t=strtotime("2020-01-01 09:02:15 UTC");
+	$t=strtotime("2020-01-02 09:02:15 UTC");
+//	SoseData::summarize("temp","live","minutely",$t);
+	SoseData::summarize("temp","minutely","hourly",$t);
+
+	return "testing... hello...";
+}
+add_shortcode("sose-test","sose_test");

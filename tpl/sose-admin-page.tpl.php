@@ -5,6 +5,18 @@
 
 	<h2>Relays</h2>
 
+	<?php
+		$t=time();
+		$m=(floor($t/86400)*86400);
+
+		echo $t."<br/>";
+		echo $m."<br/>";
+
+		echo date("Y-m-d H:i:s",$t)."<br/>";
+		echo date("Y-m-d H:i:s",$m)."<br/>";
+//		echo get_date_from_gmt(date("Y-m-d H:m:s",time()))."<br/>";
+	?>
+
 	<?php for ($i=0; $i<4; $i++) { ?>
 		<p>
 			Relay <?php echo $i; ?>
