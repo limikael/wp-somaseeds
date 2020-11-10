@@ -56,7 +56,7 @@ function sose_handle_data() {
 	$data=new SoseData();
 	$data->var=$var;
 	$data->value=$_REQUEST["value"];
-	$data->stamp=gmdate($t);
+	$data->stamp=gmdate("Y-m-d H:i:s",$t);
 	$data->span="live";
 	$data->save();
 
