@@ -93,6 +93,12 @@ function sose_admin_page() {
 		));
 	}
 
+	if (array_key_exists("reverse", $_REQUEST)) {
+		$api->call("start",array(
+			"reverse"=>TRUE
+		));
+	}
+
 	if (array_key_exists("stop", $_REQUEST)) {
 		$api->call("stop");
 	}
@@ -112,7 +118,7 @@ function sose_admin_menu() {
 }
 add_action('admin_menu','sose_admin_menu');
 
-function sose_test() {
+/*function sose_test() {
 	SoseData::query("DELETE FROM :table");
 
 	$t=strtotime("2020-01-01 09:00:00 UTC");
@@ -136,4 +142,53 @@ function sose_test() {
 
 	return "testing... hello...";
 }
-add_shortcode("sose-test","sose_test");
+add_shortcode("sose-test","sose_test");*/
+
+function sose_chart_data() {
+	//$from=gmdate(strtotime)
+
+	$datas=SoseData::findAllByQuery(
+		"SELECT * ".
+		"FROM   :table ".
+		"WHERE  var=%s ".
+		"AND    span=%s ",
+		"temp",
+		"live"
+	);
+
+	$output=array();
+	$output["tempdata"]=array();
+
+	foreach ($datas as $data) {
+		$output["tempdata"][]=array(
+			"value"=>$data->value
+		);
+	}
+
+	echo json_encode($output);
+	wp_die();
+}
+add_action("wp_ajax_sose_chart_data", "sose_chart_data");
+add_action("wp_ajax_nopriv_sose_chart_data", "sose_chart_data");
+
+function sose_chart() {
+	return 
+		'<canvas id="soseChart"></canvas>'.
+		'<script>var soseAjaxUrl="'.esc_js(admin_url('admin-ajax.php')).'";</script>';
+}
+add_shortcode("sose-chart","sose_chart");
+
+function sose_enqueue_scripts() {
+	wp_enqueue_script(
+		'charts-bundle',
+		'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js',
+		array( 'jquery' ), 1.0, true
+	);
+
+	wp_enqueue_script(
+		'somacharts-scripts', 
+		plugin_dir_url( __FILE__ ) . '/js/somaseeds.js',
+		array( 'jquery', 'charts-bundle' ), 1.0, true
+	);
+}
+add_action( 'wp_enqueue_scripts', 'sose_enqueue_scripts' );
