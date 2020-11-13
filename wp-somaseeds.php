@@ -144,25 +144,66 @@ add_action('admin_menu','sose_admin_menu');
 }
 add_shortcode("sose-test","sose_test");*/
 
-function sose_chart_data() {
-	//$from=gmdate(strtotime)
+function alignTimestampToMonth($timestamp) {
+	return strtotime(gmdate("Y-m-01 00:00:00",$timestamp)." UTC");
+}
 
-	$datas=SoseData::findAllByQuery(
-		"SELECT * ".
-		"FROM   :table ".
-		"WHERE  var=%s ".
-		"AND    span=%s ",
-		"temp",
-		"live"
-	);
+function sose_chart_data() {
+	$timestamp=$_REQUEST["timestamp"];
+	$var=$_REQUEST["var"];
+
+	if ($timestamp>time())
+		$timestamp=time();
+
+	switch ($_REQUEST["scope"]) {
+		case "hour":
+			$fromTimestamp=intval(60*60*floor($timestamp/(60*60)));
+			$toTimestamp=$fromTimestamp+60*60;
+			$prevTimestamp=$fromTimestamp-60*60;
+			$span="live";
+			$rangeLabel=
+				gmdate("j M, Y, H:i",$fromTimestamp)." -> ".
+				gmdate("H:i",$toTimestamp);
+			$labelFormat="H:i";
+			break;
+
+		case "day":
+			$fromTimestamp=intval(60*60*24*floor($timestamp/(60*60*24)));
+			$toTimestamp=$fromTimestamp+60*60*24;
+			$prevTimestamp=$fromTimestamp-60*60*24;
+			$span="minutely";
+			$rangeLabel=
+				gmdate("j M, Y",$fromTimestamp);
+			$labelFormat="H:i";
+			break;
+
+		case "month":
+			$fromTimestamp=alignTimestampToMonth($timestamp);
+			$toTimestamp=alignTimestampToMonth(alignTimestampToMonth($timestamp)+32*60*60*24);
+			$prevTimestamp=alignTimestampToMonth(alignTimestampToMonth($timestamp)-60*60*24);
+			$span="hourly";
+			$rangeLabel=
+				gmdate("M, Y",$fromTimestamp);
+			$labelFormat="j";
+			break;
+
+		default:
+			wp_die();
+			break;
+	}
 
 	$output=array();
+	$output["labels"]=array();
 	$output["tempdata"]=array();
+	$output["phdata"]=array();
+	$output["nextTimestamp"]=$toTimestamp;
+	$output["prevTimestamp"]=$prevTimestamp;
+	$output["rangeLabel"]=$rangeLabel;
 
+	$datas=SoseData::getSpanData($var,$span,$fromTimestamp,$toTimestamp);
 	foreach ($datas as $data) {
-		$output["tempdata"][]=array(
-			"value"=>$data->value
-		);
+		$output["labels"][]=gmdate($labelFormat,$data->getTimestamp());
+		$output["tempdata"][]=$data->value;
 	}
 
 	echo json_encode($output);
@@ -171,10 +212,14 @@ function sose_chart_data() {
 add_action("wp_ajax_sose_chart_data", "sose_chart_data");
 add_action("wp_ajax_nopriv_sose_chart_data", "sose_chart_data");
 
-function sose_chart() {
-	return 
-		'<canvas id="soseChart"></canvas>'.
-		'<script>var soseAjaxUrl="'.esc_js(admin_url('admin-ajax.php')).'";</script>';
+function sose_chart($params) {
+	$vars=array();
+
+	//$vars["timestamp"]=strtotime("2020-01-01 09:00:00 UTC");
+	$vars["timestamp"]=time();
+	$vars["var"]=$params["var"];
+
+	return render_template(__DIR__."/tpl/sose-chart.tpl.php",$vars);
 }
 add_shortcode("sose-chart","sose_chart");
 
@@ -189,6 +234,11 @@ function sose_enqueue_scripts() {
 		'somacharts-scripts', 
 		plugin_dir_url( __FILE__ ) . '/js/somaseeds.js',
 		array( 'jquery', 'charts-bundle' ), 1.0, true
+	);
+
+	wp_enqueue_style(
+		'somacharts-style',
+		plugin_dir_url( __FILE__ ) . '/css/somaseeds.css'
 	);
 }
 add_action( 'wp_enqueue_scripts', 'sose_enqueue_scripts' );

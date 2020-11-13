@@ -3,6 +3,13 @@
 require_once plugin_dir_path( __FILE__ ) . '/../ext/wprecord/WpRecord.php';
 
 class SoseData extends WpRecord {
+	const spans=array(
+		"live"=>5,
+		"minutely"=>60,
+		"hourly"=>60*60,
+		"daily"=>60*60*24
+	);
+
 	public static function initialize() {
 		self::field( 'id', 'integer not null auto_increment' );
 		self::field( 'var', 'char(16) not null' );
@@ -18,18 +25,10 @@ class SoseData extends WpRecord {
 	}
 
 	public static function summarize($var, $fromSpan, $toSpan, $time) {
-		$spans=array(
-			"live"=>1,
-			"minutely"=>60,
-			"hourly"=>60*60,
-			"daily"=>60*60*24
-		);
-
-		if (!$spans[$fromSpan] || !$spans[$toSpan])
+		if (!SoseData::spans[$fromSpan] || !SoseData::spans[$toSpan])
 			throw new Error("Unknown span");
 
-		$currentSpanStart=floor($time/$spans[$toSpan])*$spans[$toSpan];
-
+		$currentSpanStart=SoseData::spanifyTimestamp($toSpan,$time);
 		$datas=SoseData::findAllByQuery(
 			"SELECT * ".
 			"FROM   :table ".
@@ -49,7 +48,7 @@ class SoseData extends WpRecord {
 			}
 
 			$t=strtotime($data->stamp." UTC");
-			$t=floor($t/$spans[$toSpan])*$spans[$toSpan];
+			$t=SoseData::spanifyTimestamp($toSpan,$t);
 			$spanStamp=gmdate("Y-m-d H:i:s",$t);
 
 			if (!array_key_exists($spanStamp,$summaryDataByStamp)) {
@@ -84,5 +83,51 @@ class SoseData extends WpRecord {
 			$data->summarized=1;
 			$data->save();
 		}
+	}
+
+	public static function spanifyTimestamp($span, $time) {
+		return floor($time/SoseData::spans[$span])*SoseData::spans[$span];
+	}
+
+	public function getSpanifiedTimestamp() {
+		return SoseData::spanifyTimestamp($this->span,strtotime($this->stamp." UTC"));
+	}
+
+	public function getTimestamp() {
+		return strtotime($this->stamp." UTC");
+	}
+
+	public static function getSpanData($var, $span, $fromTimestamp, $toTimestamp) {
+		$fromTimestamp=intval($fromTimestamp);
+		$toTimestamp=intval($toTimestamp);
+
+		$datas=SoseData::findAllByQuery(
+			"SELECT * ".
+			"FROM   :table ".
+			"WHERE  var=%s ".
+			"AND    span=%s ".
+			"AND    stamp>=%s ".
+			"AND    stamp<%s",
+			$var,
+			$span,
+			gmdate("Y-m-d H:i:s",$fromTimestamp),
+			gmdate("Y-m-d H:i:s",$toTimestamp)
+		);
+
+		$datasByStamp=array();
+		foreach ($datas as $data)
+			$datasByStamp[$data->getSpanifiedTimestamp()]=$data;
+
+		for ($t=$fromTimestamp; $t<$toTimestamp; $t+=SoseData::spans[$span]) {
+			if (!array_key_exists($t,$datasByStamp)) {
+				$data=new SoseData();
+				$data->stamp=gmdate("Y-m-d H:i:s",$t);
+				$datasByStamp[$t]=$data;
+			}
+		}
+
+		ksort($datasByStamp);
+
+		return array_values($datasByStamp);
 	}
 }

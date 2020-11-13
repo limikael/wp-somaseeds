@@ -1,37 +1,81 @@
-function soseRenderChart() {
-	console.log("rendering chart");
+const $=jQuery;
+let soseResponse;
+let soseChart;
 
-	console.log(soseAjaxUrl);
+async function soseRenderChart() {
+	if (soseChart)
+		soseChart.destroy();
+
+	$("#soseChartSelect").attr('disabled',true);
+	$("#soseChartPrev").attr('disabled',true);
+	$("#soseChartNext").attr('disabled',true);
+	$('#spanLabel').html("");
+
+	let timestamp=soseChartTimestamp;
+	soseResponse=await $.ajax(soseAjaxUrl,{
+		data: {
+			action: "sose_chart_data",
+			timestamp: timestamp,
+			scope: $("#soseChartSelect").val(),
+			var: soseVar
+		},
+		dataType: "json"
+	});
+
+	$("#soseChartSelect").attr('disabled',false);
+	$("#soseChartPrev").attr('disabled',false);
+	$("#soseChartNext").attr('disabled',false);
+	$('#spanLabel').html(soseResponse.rangeLabel);
 
 	var ctx = document.getElementById('soseChart').getContext('2d');
-	var chart = new Chart(ctx, {
+	soseChart = new Chart(ctx, {
 	    // The type of chart we want to create
 	    type: 'line',
 
 	    // The data for our dataset
 	    data: {
-	        labels: ['January', '', 'February', 'March', 'April', 'May', 'June', 'July'],
+	        labels: soseResponse.labels,
 	        datasets: [{
-	            //label: 'My First dataset',
-	            /*backgroundColor: 'rgb(255, 99, 132)',*/
 	            borderColor: 'rgb(255, 99, 132)',
-	            data: [0, 10, 5, 2, 20, 30, 100, 60]
-	        }/*,{
-	            label: 'My Second dataset',
-	            backgroundColor: 'rgb(255, 99, 132)',
-	            borderColor: 'rgb(255, 99, 132)',
-	            data: [200, 10, 5, 2, 20, 30, 100, 60]
-	        }*/]
+	            data: soseResponse.tempdata,
+	            label: soseVar.charAt(0).toUpperCase()+soseVar.slice(1)
+	        }]
 	    },
 
 	    // Configuration options go here
 	    options: {
-	        legend: {
+	    	animation: {
+	    		duration: 0
+	    	},
+	        /*legend: {
 	        	display: false
+	        },*/
+	        scales: {
+	        	xAxes: [{
+	        		ticks: {
+	        			maxTicksLimit: 12
+	        		}
+	        	}]
 	        }
     	},
 	});
 }
 
-if (document.getElementById("soseChart"))
+function soseInitChart() {
+	$("#soseChartSelect").change(soseRenderChart);
+
+	$("#soseChartPrev").click(()=>{
+		soseChartTimestamp=soseResponse.prevTimestamp;
+		soseRenderChart();
+	});
+
+	$("#soseChartNext").click(()=>{
+		soseChartTimestamp=soseResponse.nextTimestamp;
+		soseRenderChart();
+	});
+
 	soseRenderChart();
+}
+
+if (document.getElementById("soseChart"))
+	soseInitChart();
