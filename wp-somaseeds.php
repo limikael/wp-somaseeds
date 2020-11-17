@@ -74,33 +74,55 @@ function sose_admin_page() {
 	$vars=array();
 	$api=new SoseApi("http://wordpress-59420-1495432.cloudwaysapps.com:8888/somaseeds1/");
 
-	if (array_key_exists("relay", $_REQUEST)) {
-		$api->call("relay",array(
-			"relay"=>$_REQUEST["relay"],
-			"val"=>$_REQUEST["val"]
-		));
+	$vars["apiResult"]=NULL;
+	$vars["apiError"]=NULL;
+	$vars["statusError"]=NULL;
+
+	try {
+		if (array_key_exists("relay", $_REQUEST)) {
+			$apiResult=$api->call("relay",array(
+				"relay"=>$_REQUEST["relay"],
+				"val"=>$_REQUEST["val"]
+			));
+		}
+
+		else if (array_key_exists("start", $_REQUEST)) {
+			$apiResult=$api->call("start",array(
+				"rpm"=>$_REQUEST["rpm"]
+			));
+		}
+
+		else if (array_key_exists("reverse", $_REQUEST)) {
+			$apiResult=$api->call("start",array(
+				"reverse"=>TRUE
+			));
+		}
+
+		else if (array_key_exists("stop", $_REQUEST)) {
+			$apiResult=$api->call("stop");
+		}
+
+		else if (array_key_exists("light",$_REQUEST)) {
+			$apiResult=$api->call("lightSchedule",array(
+				"schedule"=>$_REQUEST["lightSchedule"],
+				"duration"=>$_REQUEST["lightDuration"]
+			));
+			$vars["apiResult"]="Light settings updated.";
+		}
 	}
 
-	if (array_key_exists("steps", $_REQUEST)) {
-		$api->call("step",array(
-			"steps"=>$_REQUEST["steps"]
-		));
+	catch (Exception $e) {
+		$vars["apiError"]=$e->getMessage();
 	}
 
-	if (array_key_exists("start", $_REQUEST)) {
-		$api->call("start",array(
-			"rpm"=>$_REQUEST["rpm"]
-		));
+	try {
+		$status=$api->call("status");
+		$vars["lightSchedule"]=$status["settings"]["lightSchedule"];
+		$vars["lightDuration"]=$status["settings"]["lightDuration"];
 	}
 
-	if (array_key_exists("reverse", $_REQUEST)) {
-		$api->call("start",array(
-			"reverse"=>TRUE
-		));
-	}
-
-	if (array_key_exists("stop", $_REQUEST)) {
-		$api->call("stop");
+	catch (Exception $e) {
+		$vars["statusError"]=$e->getMessage();
 	}
 
 	$vars["formurl"]=admin_url("admin.php?page=somaseeds");

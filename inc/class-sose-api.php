@@ -11,6 +11,13 @@ class SoseApi extends WpRecord {
 		$curl=curl_init();
 		curl_setopt($curl,CURLOPT_URL,$url);
 		curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
-		$res=curl_exec($curl);
+		$encoded=curl_exec($curl);
+		$res=json_decode($encoded,TRUE);
+
+		if (!$res || !array_key_exists("ok",$res) || !$res["ok"]) {
+			throw new Exception("Unable to perform API call: ".$encoded);
+		}
+
+		return $res;
 	}
 }
