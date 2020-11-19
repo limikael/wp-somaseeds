@@ -11,6 +11,10 @@ class SoseApi extends WpRecord {
 		$curl=curl_init();
 		curl_setopt($curl,CURLOPT_URL,$url);
 		curl_setopt($curl,CURLOPT_RETURNTRANSFER,1);
+		curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+			"X-Api-Key: ysOIV9vNp1hS2tHC"
+		));
+
 		$encoded=curl_exec($curl);
 		$res=json_decode($encoded,TRUE);
 
