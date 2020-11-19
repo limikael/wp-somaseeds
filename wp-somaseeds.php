@@ -133,6 +133,10 @@ function sose_admin_page() {
 		$vars["forwardDuration"]=$status["settings"]["forwardDuration"];
 		$vars["backwardSchedule"]=$status["settings"]["backwardSchedule"];
 		$vars["backwardDuration"]=$status["settings"]["backwardDuration"];
+		$vars["temperature"]=$status["reading"]["temperature"];
+		$vars["humidity"]=$status["reading"]["humidity"];
+		$vars["ph"]=$status["reading"]["ph"];
+		$vars["phRaw"]=$status["reading"]["phRaw"];
 	}
 
 	catch (Exception $e) {

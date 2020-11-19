@@ -18,6 +18,14 @@
 			<?php echo esc_html($statusError); ?>
 		</p></div>
 	<?php } else { ?>
+		<div class="card">
+			<h2 class="title">Live Values</h2>
+			<p>Temperature: <?php printf("%.2f",($vars["temperature"])); ?></p>
+			<p>Humidity: <?php printf("%.2f",$vars["humidity"]); ?></p>
+			<p>pH: <?php echo esc_html($vars["ph"]); ?></p>
+			<p>pH Raw Reading: <?php echo esc_html($vars["phRaw"]); ?></p>
+		</div>
+
 		<h2>Light Timer</h2>
 		<form action="<?php echo $formurl; ?>" method="POST">
 			<input type="hidden" name="page" value="somaseeds"/>
