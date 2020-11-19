@@ -129,6 +129,14 @@ function sose_admin_page() {
 			));
 			$vars["apiResult"]="Pump motor settings updated.";
 		}
+
+		else if (array_key_exists("temp",$_REQUEST)) {
+			$apiResult=$api->call("setTempValues",array(
+				"lowTemp"=>$_REQUEST["lowTemp"],
+				"highTemp"=>$_REQUEST["highTemp"],
+			));
+			$vars["apiResult"]="Temperature updated.";
+		}
 	}
 
 	catch (Exception $e) {
@@ -147,6 +155,9 @@ function sose_admin_page() {
 		$vars["phFirstTranslated"]=$status["settings"]["phFirstTranslated"];
 		$vars["phSecondRaw"]=$status["settings"]["phSecondRaw"];
 		$vars["phSecondTranslated"]=$status["settings"]["phSecondTranslated"];
+		$vars["lowTemp"]=$status["settings"]["lowTemp"];
+		$vars["highTemp"]=$status["settings"]["highTemp"];
+
 		$vars["temperature"]=$status["reading"]["temperature"];
 		$vars["humidity"]=$status["reading"]["humidity"];
 		$vars["ph"]=$status["reading"]["ph"];

@@ -110,6 +110,26 @@
 			<input type="submit" value="Update pH Calibration" class="button button-primary" name="ph"/>
 		</form>
 
+		<h2>Temperature</h2>
+		<form action="<?php echo $formurl; ?>" method="POST">
+			<input type="hidden" name="page" value="somaseeds"/>
+			<table class="form-table">
+				<tr>
+					<th scope="row">Low Value</th>
+					<td>
+						<input type="text" name="lowTemp" value="<?php echo esc_attr($lowTemp); ?>"/>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">High Value</th>
+					<td>
+						<input type="text" name="highTemp" value="<?php echo esc_attr($highTemp); ?>"/>
+					</td>
+				</tr>
+			</table>
+			<input type="submit" value="Update Temperature" class="button button-primary" name="temp"/>
+		</form>
+
 		<h2>Timer Syntax</h2>
 		<p>
 			The schedule uses the <a href="https://github.com/breejs/later">later.js</a> library.
