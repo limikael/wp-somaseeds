@@ -22,7 +22,7 @@
 			<h2 class="title">Live Values</h2>
 			<p>Temperature: <?php printf("%.2f",($vars["temperature"])); ?></p>
 			<p>Humidity: <?php printf("%.2f",$vars["humidity"]); ?></p>
-			<p>pH: <?php echo esc_html($vars["ph"]); ?></p>
+			<p>pH: <?php printf("%.2f",$vars["ph"]); ?></p>
 			<p>pH Raw Reading: <?php echo esc_html($vars["phRaw"]); ?></p>
 		</div>
 
@@ -76,6 +76,38 @@
 				</tr>
 			</table>
 			<input type="submit" value="Update Motor Settings" class="button button-primary" name="motor"/>
+		</form>
+
+		<h2>phCalibration</h2>
+		<form action="<?php echo $formurl; ?>" method="POST">
+			<input type="hidden" name="page" value="somaseeds"/>
+			<table class="form-table">
+				<tr>
+					<th scope="row">The raw value...</th>
+					<td>
+						<input type="text" name="phFirstRaw" value="<?php echo esc_attr($phFirstRaw); ?>"/>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">...translates to</th>
+					<td>
+						<input type="text" name="phFirstTranslated" value="<?php echo esc_attr($phFirstTranslated); ?>"/>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">The raw value...</th>
+					<td>
+						<input type="text" name="phSecondRaw" value="<?php echo esc_attr($phSecondRaw); ?>"/>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">...translates to</th>
+					<td>
+						<input type="text" name="phSecondTranslated" value="<?php echo esc_attr($phSecondTranslated); ?>"/>
+					</td>
+				</tr>
+			</table>
+			<input type="submit" value="Update pH Calibration" class="button button-primary" name="ph"/>
 		</form>
 
 		<h2>Timer Syntax</h2>

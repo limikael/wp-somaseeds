@@ -110,6 +110,16 @@ function sose_admin_page() {
 			$vars["apiResult"]="Light settings updated.";
 		}
 
+		else if (array_key_exists("ph",$_REQUEST)) {
+			$apiResult=$api->call("setPhCalibration",array(
+				"phFirstRaw"=>$_REQUEST["phFirstRaw"],
+				"phFirstTranslated"=>$_REQUEST["phFirstTranslated"],
+				"phSecondRaw"=>$_REQUEST["phSecondRaw"],
+				"phSecondTranslated"=>$_REQUEST["phSecondTranslated"]
+			));
+			$vars["apiResult"]="pH Calibration Updated.";
+		}
+
 		else if (array_key_exists("motor",$_REQUEST)) {
 			$apiResult=$api->call("motorSchedule",array(
 				"forwardSchedule"=>$_REQUEST["forwardSchedule"],
@@ -133,6 +143,10 @@ function sose_admin_page() {
 		$vars["forwardDuration"]=$status["settings"]["forwardDuration"];
 		$vars["backwardSchedule"]=$status["settings"]["backwardSchedule"];
 		$vars["backwardDuration"]=$status["settings"]["backwardDuration"];
+		$vars["phFirstRaw"]=$status["settings"]["phFirstRaw"];
+		$vars["phFirstTranslated"]=$status["settings"]["phFirstTranslated"];
+		$vars["phSecondRaw"]=$status["settings"]["phSecondRaw"];
+		$vars["phSecondTranslated"]=$status["settings"]["phSecondTranslated"];
 		$vars["temperature"]=$status["reading"]["temperature"];
 		$vars["humidity"]=$status["reading"]["humidity"];
 		$vars["ph"]=$status["reading"]["ph"];
