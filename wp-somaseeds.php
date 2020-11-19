@@ -109,6 +109,16 @@ function sose_admin_page() {
 			));
 			$vars["apiResult"]="Light settings updated.";
 		}
+
+		else if (array_key_exists("motor",$_REQUEST)) {
+			$apiResult=$api->call("motorSchedule",array(
+				"forwardSchedule"=>$_REQUEST["forwardSchedule"],
+				"forwardDuration"=>$_REQUEST["forwardDuration"],
+				"backwardSchedule"=>$_REQUEST["backwardSchedule"],
+				"backwardDuration"=>$_REQUEST["backwardDuration"]
+			));
+			$vars["apiResult"]="Pump motor settings updated.";
+		}
 	}
 
 	catch (Exception $e) {
@@ -119,6 +129,10 @@ function sose_admin_page() {
 		$status=$api->call("status");
 		$vars["lightSchedule"]=$status["settings"]["lightSchedule"];
 		$vars["lightDuration"]=$status["settings"]["lightDuration"];
+		$vars["forwardSchedule"]=$status["settings"]["forwardSchedule"];
+		$vars["forwardDuration"]=$status["settings"]["forwardDuration"];
+		$vars["backwardSchedule"]=$status["settings"]["backwardSchedule"];
+		$vars["backwardDuration"]=$status["settings"]["backwardDuration"];
 	}
 
 	catch (Exception $e) {

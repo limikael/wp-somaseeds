@@ -19,22 +19,6 @@
 		</p></div>
 	<?php } else { ?>
 		<h2>Light Timer</h2>
-		<p>
-			The schedule uses the <a href="https://github.com/breejs/later">later.js</a> library.
-			It accepts expressions like:
-			<ul>
-				<li>every 1 hour</li>
-				<li>on the 5 minute on the 2,3,4 hour every weekday</li>
-				<li>on the 0,15,30,45 second<li>
-			</ul>
-			The duration uses the <a href="https://www.npmjs.com/package/ms">ms</a> library.
-			It accepts expressions like:
-			<ul>
-				<li>1 hour</li>
-				<li>30 min</li>
-				<li>5 sec<li>
-			</ul>
-		</p>
 		<form action="<?php echo $formurl; ?>" method="POST">
 			<input type="hidden" name="page" value="somaseeds"/>
 			<table class="form-table">
@@ -53,6 +37,56 @@
 			</table>
 			<input type="submit" value="Update Light Settings" class="button button-primary" name="light"/>
 		</form>
+
+		<h2>Pump Motor</h2>
+		<form action="<?php echo $formurl; ?>" method="POST">
+			<input type="hidden" name="page" value="somaseeds"/>
+			<table class="form-table">
+				<tr>
+					<th scope="row">Forward Schedule</th>
+					<td>
+						<input type="text" name="forwardSchedule" value="<?php echo esc_attr($forwardSchedule); ?>"/>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">Forward Duration</th>
+					<td>
+						<input type="text" name="forwardDuration" value="<?php echo esc_attr($forwardDuration); ?>"/>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">Backward Schedule</th>
+					<td>
+						<input type="text" name="backwardSchedule" value="<?php echo esc_attr($backwardSchedule); ?>"/>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">Backward Duration</th>
+					<td>
+						<input type="text" name="backwardDuration" value="<?php echo esc_attr($backwardDuration); ?>"/>
+					</td>
+				</tr>
+			</table>
+			<input type="submit" value="Update Motor Settings" class="button button-primary" name="motor"/>
+		</form>
+
+		<h2>Timer Syntax</h2>
+		<p>
+			The schedule uses the <a href="https://github.com/breejs/later">later.js</a> library.
+			It accepts expressions like:
+			<ul>
+				<li>every 1 hour</li>
+				<li>on the 5 minute on the 2,3,4 hour every weekday</li>
+				<li>on the 0,15,30,45 second<li>
+			</ul>
+			The duration uses the <a href="https://www.npmjs.com/package/ms">ms</a> library.
+			It accepts expressions like:
+			<ul>
+				<li>1 hour</li>
+				<li>30 min</li>
+				<li>5 sec<li>
+			</ul>
+		</p>
 
 		<p>The below is for testing...</p>
 
