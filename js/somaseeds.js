@@ -77,5 +77,38 @@ function soseInitChart() {
 	soseRenderChart();
 }
 
+function soseUpdateControls() {
+	switch ($('#sosemode').val()) {
+		case "manual":
+			$('#soseManualControl').show();
+			$('#soseAutoControl').hide();
+			$('#soseDebugControl').hide();
+			break;
+
+		case "auto":
+			$('#soseManualControl').hide();
+			$('#soseAutoControl').show();
+			$('#soseDebugControl').hide();
+			break;
+
+		case "autodebug":
+			$('#soseManualControl').hide();
+			$('#soseAutoControl').show();
+			$('#soseDebugControl').show();
+			break;
+	}
+}
+
+function soseInitAdmin() {
+	soseUpdateControls();
+
+	$('#sosemode').change(()=>{
+		soseUpdateControls();
+	});
+}
+
 if (document.getElementById("soseChart"))
 	soseInitChart();
+
+if (document.getElementById("soseAdminForm"))
+	soseInitAdmin();

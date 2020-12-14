@@ -79,63 +79,24 @@ function sose_admin_page() {
 	$vars["statusError"]=NULL;
 
 	try {
-		if (array_key_exists("relay", $_REQUEST)) {
-			$apiResult=$api->call("relay",array(
-				"relay"=>$_REQUEST["relay"],
-				"val"=>$_REQUEST["val"]
-			));
-		}
+		if (array_key_exists("updateSettings", $_REQUEST)) {
+			$params=array();
+			$settingNames=array(
+				"lightSchedule","lightDuration",
+				"forwardSchedule","forwardDuration",
+				"backwardSchedule","backwardDuration",
+				"phFirstRaw","phFirstTranslated",
+				"phSecondRaw","phSecondTranslated",
+				"lowTemp","highTemp",
+				"light","heater","pump","fan",
+				"mode","debugTemp",
+			);
 
-		else if (array_key_exists("start", $_REQUEST)) {
-			$apiResult=$api->call("start",array(
-				"rpm"=>$_REQUEST["rpm"]
-			));
-		}
+			foreach ($settingNames as $settingName)
+				if (array_key_exists($settingName,$_REQUEST))
+					$params[$settingName]=$_REQUEST[$settingName];
 
-		else if (array_key_exists("reverse", $_REQUEST)) {
-			$apiResult=$api->call("start",array(
-				"reverse"=>TRUE
-			));
-		}
-
-		else if (array_key_exists("stop", $_REQUEST)) {
-			$apiResult=$api->call("stop");
-		}
-
-		else if (array_key_exists("light",$_REQUEST)) {
-			$apiResult=$api->call("lightSchedule",array(
-				"schedule"=>$_REQUEST["lightSchedule"],
-				"duration"=>$_REQUEST["lightDuration"]
-			));
-			$vars["apiResult"]="Light settings updated.";
-		}
-
-		else if (array_key_exists("ph",$_REQUEST)) {
-			$apiResult=$api->call("setPhCalibration",array(
-				"phFirstRaw"=>$_REQUEST["phFirstRaw"],
-				"phFirstTranslated"=>$_REQUEST["phFirstTranslated"],
-				"phSecondRaw"=>$_REQUEST["phSecondRaw"],
-				"phSecondTranslated"=>$_REQUEST["phSecondTranslated"]
-			));
-			$vars["apiResult"]="pH Calibration Updated.";
-		}
-
-		else if (array_key_exists("motor",$_REQUEST)) {
-			$apiResult=$api->call("motorSchedule",array(
-				"forwardSchedule"=>$_REQUEST["forwardSchedule"],
-				"forwardDuration"=>$_REQUEST["forwardDuration"],
-				"backwardSchedule"=>$_REQUEST["backwardSchedule"],
-				"backwardDuration"=>$_REQUEST["backwardDuration"]
-			));
-			$vars["apiResult"]="Pump motor settings updated.";
-		}
-
-		else if (array_key_exists("temp",$_REQUEST)) {
-			$apiResult=$api->call("setTempValues",array(
-				"lowTemp"=>$_REQUEST["lowTemp"],
-				"highTemp"=>$_REQUEST["highTemp"],
-			));
-			$vars["apiResult"]="Temperature updated.";
+			$apiResult=$api->call("setting",$params);
 		}
 	}
 
@@ -145,23 +106,30 @@ function sose_admin_page() {
 
 	try {
 		$status=$api->call("status");
-		$vars["lightSchedule"]=$status["settings"]["lightSchedule"];
-		$vars["lightDuration"]=$status["settings"]["lightDuration"];
-		$vars["forwardSchedule"]=$status["settings"]["forwardSchedule"];
-		$vars["forwardDuration"]=$status["settings"]["forwardDuration"];
-		$vars["backwardSchedule"]=$status["settings"]["backwardSchedule"];
-		$vars["backwardDuration"]=$status["settings"]["backwardDuration"];
-		$vars["phFirstRaw"]=$status["settings"]["phFirstRaw"];
-		$vars["phFirstTranslated"]=$status["settings"]["phFirstTranslated"];
-		$vars["phSecondRaw"]=$status["settings"]["phSecondRaw"];
-		$vars["phSecondTranslated"]=$status["settings"]["phSecondTranslated"];
-		$vars["lowTemp"]=$status["settings"]["lowTemp"];
-		$vars["highTemp"]=$status["settings"]["highTemp"];
+		$vars["lightSchedule"]=$status["lightSchedule"];
+		$vars["lightDuration"]=$status["lightDuration"];
+		$vars["forwardSchedule"]=$status["forwardSchedule"];
+		$vars["forwardDuration"]=$status["forwardDuration"];
+		$vars["backwardSchedule"]=$status["backwardSchedule"];
+		$vars["backwardDuration"]=$status["backwardDuration"];
+		$vars["phFirstRaw"]=$status["phFirstRaw"];
+		$vars["phFirstTranslated"]=$status["phFirstTranslated"];
+		$vars["phSecondRaw"]=$status["phSecondRaw"];
+		$vars["phSecondTranslated"]=$status["phSecondTranslated"];
+		$vars["lowTemp"]=$status["lowTemp"];
+		$vars["highTemp"]=$status["highTemp"];
+		$vars["mode"]=$status["mode"];
 
-		$vars["temperature"]=$status["reading"]["temperature"];
-		$vars["humidity"]=$status["reading"]["humidity"];
-		$vars["ph"]=$status["reading"]["ph"];
-		$vars["phRaw"]=$status["reading"]["phRaw"];
+		$vars["temperature"]=$status["temperature"];
+		$vars["humidity"]=$status["humidity"];
+		$vars["ph"]=$status["ph"];
+		$vars["phRaw"]=$status["phRaw"];
+
+		$vars["light"]=$status["light"];
+		$vars["heater"]=$status["heater"];
+		$vars["pump"]=$status["pump"];
+		$vars["fan"]=$status["fan"];
+		$vars["debugTemp"]=$status["debugTemp"];
 	}
 
 	catch (Exception $e) {
@@ -307,3 +275,4 @@ function sose_enqueue_scripts() {
 	);
 }
 add_action( 'wp_enqueue_scripts', 'sose_enqueue_scripts' );
+add_action( 'admin_enqueue_scripts', 'sose_enqueue_scripts' );
